@@ -2,189 +2,389 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Parque das Letras - Menu Principal</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0f2a">
+    <title>EdHumanas - Jogos Educativos</title>
+    
     <style>
-        :root {
-            --primary: #ff6f61;
-            --secondary: #ffca28;
-            --bg-soft: #f3e9d7;
-            --text: #3e2723;
-            --card-bg: #fffdf8;
-            --line-color: #d6e2f5;
-            --margin-line: rgba(255, 82, 82, 0.5);
-            
-            /* Cores dos botões do menu */
-            --btn-1: linear-gradient(135deg, #ff6f61, #ff8a65);
-            --btn-chuvinha: linear-gradient(135deg, #b39ddb, #ce93d8);
-            --btn-2: linear-gradient(135deg, #42a5f5, #29b6f6);
-            --btn-3: linear-gradient(135deg, #66bb6a, #81c784);
-            --btn-4: linear-gradient(135deg, #ab47bc, #ec407a);
-            --btn-forca: linear-gradient(135deg, #ffa726, #fb8c00); /* Nova cor para a Forca */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background: var(--bg-soft); color: var(--text);
-            min-height: 100vh; display: flex; align-items: center; justify-content: center;
-            transition: background 0.3s ease, color 0.3s ease;
-        }
-        body.dark {
-            --bg-soft: #101017;
-            --text: #f5f5f5;
-            --card-bg: #181824;
-            --line-color: #2a3142;
-            --margin-line: rgba(255, 138, 101, 0.7);
-        }
-        .app { width: 100%; max-width: 800px; padding: 16px; text-align: center; }
-        .card {
-            position: relative; background-color: var(--card-bg); border-radius: 18px; 
-            padding: 30px 20px 40px; text-align: center;
-            box-shadow: 0 16px 40px rgba(0,0,0,0.16), 0 0 0 4px rgba(255,255,255,0.9);
-            overflow: hidden;
-            background-image: repeating-linear-gradient(to bottom, transparent 0px, transparent 28px, var(--line-color) 29px);
-            background-size: 100% 29px;
-            transition: background-color 0.3s, box-shadow 0.3s;
-        }
-        body.dark .card { box-shadow: 0 16px 40px rgba(0,0,0,0.7), 0 0 0 2px rgba(255,255,255,0.06); }
-        .card::before {
-            content: ""; position: absolute; top: 0; bottom: 0; left: 45px; width: 2px;
-            background: var(--margin-line); transition: background 0.3s;
-        }
-        .btn-back {
-            position: absolute; top: 12px; left: 16px; padding: 6px 14px;
-            border-radius: 999px; background: rgba(255,255,255,0.9);
-            border: 1px solid rgba(0,0,0,0.12); color: var(--text);
-            text-decoration: none; font-weight: 700; font-size: 14px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15); z-index: 10;
-            display: flex; align-items: center; gap: 6px; transition: transform 0.2s;
-        }
-        .btn-back:hover { transform: scale(1.05); }
-        body.dark .btn-back { background: rgba(30,30,45,0.9); border-color: rgba(255,255,255,0.15); }
-        .theme-toggle {
-            position: absolute; top: 12px; right: 16px; width: 38px; height: 38px;
-            border-radius: 50%; border: 1px solid rgba(0,0,0,0.12);
-            background: rgba(255,255,255,0.9); box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center;
-            z-index: 10;
-        }
-        body.dark .theme-toggle { background: rgba(30,30,45,0.9); border-color: rgba(255,255,255,0.15); }
-        .stamp {
-            position: absolute; width: 60px; height: 60px; border-radius: 16px;
-            border: 2px dashed rgba(0,0,0,0.16); display: flex; align-items: center; justify-content: center;
-            font-size: 32px; transform: rotate(-5deg); opacity: 0.85; background: rgba(255,255,255,0.9);
-            z-index: 1;
-        }
-        body.dark .stamp { border-color: rgba(255,255,255,0.15); background: rgba(18,18,28,0.95); }
-        .stamp-1 { top: 65px; left: 16px; transform: rotate(-10deg); }
-        .stamp-2 { bottom: 20px; right: 16px; transform: rotate(8deg); }
-        .title {
-            font-size: clamp(32px, 6vw, 42px); color: var(--primary); font-weight: 900;
-            margin-bottom: 8px; position: relative; z-index: 2; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
-        body.dark .title { color: #ffb74d; }
-        .subtitle {
-            font-size: 16px; color: var(--text); opacity: 0.9; margin-bottom: 30px;
-            position: relative; z-index: 2; font-weight: 500;
-        }
-        .menu-grid {
-            display: grid; grid-template-columns: 1fr; gap: 16px;
-            max-width: 500px; margin: 0 auto; position: relative; z-index: 2;
-        }
-        @media (min-width: 600px) {
-            .card { padding: 40px 30px; }
-            .card::before { left: 55px; }
-        }
-        .menu-btn {
-            display: flex; align-items: center; gap: 16px;
-            padding: 16px 24px; border-radius: 20px; border: none; text-decoration: none;
-            color: #fff; font-size: 22px; font-weight: 800; cursor: pointer;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
-        }
-        .menu-btn:active, .menu-btn:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.25);
-        }
-        .btn-alfabeto { background: var(--btn-1); }
-        .btn-chuvinha { background: var(--btn-chuvinha); }
-        .btn-chuva { background: var(--btn-2); }
-        .btn-memoria { background: var(--btn-3); }
-        .btn-pesca { background: var(--btn-4); }
-        .btn-forca { background: var(--btn-forca); }
 
-        .btn-icon {
-            font-size: 32px; background: rgba(255,255,255,0.2); 
-            width: 50px; height: 50px; border-radius: 14px;
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        body {
+            font-family: 'Segoe UI', 'Comic Neue', 'Comic Sans MS', Tahoma, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0f2a 0%, #0a1a3a 50%, #0a0f2a 100%);
+            color: white;
+            overflow-x: hidden;
+            position: relative;
         }
-        .btn-text { display: flex; flex-direction: column; text-align: left; }
-        .btn-text span:last-child { font-size: 13px; font-weight: 600; opacity: 0.9; margin-top: 2px; }
-        .mascot { font-size: 60px; margin-bottom: 10px; animation: float 3s ease-in-out infinite; position: relative; z-index: 2; }
+
+        /* Vídeo de fundo */
+        #bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+            opacity: 0.35;
+            filter: brightness(0.7);
+        }
+
+        /* Overlay escuro */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(0,20,50,0.6), rgba(0,0,20,0.85));
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Cabeçalho */
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #ffd700, #ff8c00, #ff6f00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(255,140,0,0.3);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1rem;
+            color: #aaddff;
+            letter-spacing: 1px;
+        }
+
+        @media (min-width: 768px) {
+            .header h1 {
+                font-size: 3.5rem;
+            }
+            .header p {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Grade de jogos */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        /* Cards dos jogos */
+        .game-card {
+            background: rgba(10, 25, 45, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 25px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,215,0,0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(255, 215, 0, 0.8);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .game-card:hover::before {
+            opacity: 1;
+        }
+
+        .game-card:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+
+        .game-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .game-card h2 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #ffd966;
+        }
+
+        .game-card p {
+            font-size: 0.85rem;
+            color: #bbddff;
+            line-height: 1.4;
+        }
+
+        .game-badge {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 5px 12px;
+            background: rgba(255,140,0,0.3);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            color: #ffb347;
+            border: 1px solid rgba(255,140,0,0.5);
+        }
+
+        @media (min-width: 768px) {
+            .game-icon {
+                font-size: 5rem;
+            }
+            .game-card h2 {
+                font-size: 1.6rem;
+            }
+            .game-card p {
+                font-size: 0.95rem;
+            }
+            .game-badge {
+                font-size: 0.75rem;
+                padding: 5px 15px;
+            }
+        }
+
+        /* Card especial - Pesca de Letrinhas (principal) */
+        .game-card.primary {
+            background: linear-gradient(135deg, rgba(30, 60, 90, 0.9), rgba(20, 40, 70, 0.9));
+            border: 2px solid #ffd700;
+            box-shadow: 0 0 20px rgba(255,215,0,0.2);
+        }
+
+        .game-card.primary .game-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Card especial - Sílabas Complexas */
+        .game-card.special {
+            background: linear-gradient(135deg, rgba(40, 50, 80, 0.9), rgba(25, 35, 60, 0.9));
+            border: 2px solid #ff8c00;
+        }
+
+        /* Animações */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         @keyframes float {
-            0% { transform: translateY(0px); }
+            0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
+        }
+
+        /* Botão de áudio */
+        .audio-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.6);
+            border: 2px solid #ffd700;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s;
+            z-index: 100;
+            color: white;
+        }
+
+        .audio-btn:hover {
+            transform: scale(1.05);
+            background: rgba(0,0,0,0.8);
+        }
+
+        /* Rodapé */
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #6688aa;
+        }
+
+        @media (min-width: 768px) {
+            .footer {
+                margin-top: 60px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Bolhas decorativas */
+        .bubble {
+            position: fixed;
+            bottom: -50px;
+            background: radial-gradient(circle, rgba(100,200,255,0.3), rgba(50,100,150,0.1));
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            animation: rise linear infinite;
+        }
+
+        @keyframes rise {
+            to {
+                transform: translateY(-120vh);
+                opacity: 0;
+            }
         }
     </style>
 </head>
 <body>
-<div class="app">
-    <div class="card">
-        <a href="https://letramento-vogais.vercel.app/index.html" class="btn-back">⬅️ Voltar</a>
-        <button class="theme-toggle" id="themeToggle">🌞</button>
-        <div class="stamp stamp-1">🎪</div><div class="stamp stamp-2">🎈</div>
-        <div class="mascot">🛝</div>
-        <h1 class="title">Parque das Letras</h1>
-        <p class="subtitle">Escolha uma brincadeira para aprender se divertindo!</p>
 
-        <div class="menu-grid">
-            <a href="alfabeto.html" class="menu-btn btn-alfabeto">
-                <div class="btn-icon">🔤</div>
-                <div class="btn-text"><span>Aprenda o Alfabeto</span><span>Conheça e ouça as letras</span></div>
-            </a>
-            <a href="chuvinha_de_letras.html" class="menu-btn btn-chuvinha">
-                <div class="btn-icon">🌦️</div>
-                <div class="btn-text"><span>Chuvinha de Letras</span><span>Uma chuvinha leve e divertida</span></div>
-            </a>
-            <a href="chuva_de_letras.html" class="menu-btn btn-chuva">
-                <div class="btn-icon">🌧️</div>
-                <div class="btn-text"><span>Chuva de Letras</span><span>Pegue as letras caindo</span></div>
-            </a>
-            <a href="jogo_da_memoria.html" class="menu-btn btn-memoria">
-                <div class="btn-icon">🃏</div>
-                <div class="btn-text"><span>Jogo da Memória</span><span>Encontre os pares certinhos</span></div>
-            </a>
-            <a href="pesca_de_letrinhas.html" class="menu-btn btn-pesca">
-                <div class="btn-icon">🎣</div>
-                <div class="btn-text"><span>Pesca de Letrinhas</span><span>Pesque as letras na lagoa</span></div>
-            </a>
-            <a href="forca.html" class="menu-btn btn-forca">
-                <div class="btn-icon">🪢</div>
-                <div class="btn-text"><span>Jogo da Forca</span><span>Adivinhe a palavra da infância</span></div>
-            </a>
+<video autoplay loop muted playsinline id="bg-video">
+    <source src="video_mar.mp4" type="video/mp4">
+</video>
+
+<audio id="bg-audio" src="som_fundo_do_mar.mp3" loop></audio>
+
+<div class="container">
+    <div class="header">
+        <h1>🐠 EdHumanas 🐠</h1>
+        <p>Jogos Educativos • Aprenda brincando no mundo subaquático</p>
+    </div>
+
+    <div class="games-grid">
+        <!-- Jogo 1: Pesca das Letrinhas (PRINCIPAL) -->
+        <div class="game-card primary" onclick="navegar('index_pesca.html')">
+            <div class="game-icon">🔤🐟</div>
+            <h2>Pesca das Letrinhas</h2>
+            <p>Aprenda o alfabeto pescando as letras! Cada letra tem sua pronúncia e você avança de fase. 🌟</p>
+            <div class="game-badge">⭐ 26 letras • 2 fases • Cronômetro</div>
         </div>
+
+        <!-- Jogo 2: Famílias Silábicas -->
+        <div class="game-card" onclick="navegar('pesca_silabica.html')">
+            <div class="game-icon">📖🐠</div>
+            <h2>Famílias Silábicas</h2>
+            <p>Pesque sílabas como BA, BE, BI, BO, BU! Aprenda as famílias do B ao Z com animais marinhos.</p>
+            <div class="game-badge">⭐ 22 famílias • 3 etapas • +30 criaturas</div>
+        </div>
+
+        <!-- Jogo 3: Sílabas Complexas -->
+        <div class="game-card special" onclick="navegar('pesca_complexa.html')">
+            <div class="game-icon">🔱🐢✨</div>
+            <h2>Pesca de Letras Complexas</h2>
+            <p>Desafio avançado: AL, EL, IL, OL, UL | BRA, BRE, BRI... | CHA, CHE, CHI... | NHA, NHE, NHI... e muito mais!</p>
+            <div class="game-badge">🏆 25 categorias • +150 sílabas • Tesouros submarinos</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>🌊 Clique no card para jogar • Clique no peixe para pescar • Toque na letra/sílaba para ouvir a pronúncia 🌊</p>
     </div>
 </div>
 
+<button class="audio-btn" id="audioToggle" onclick="toggleAudio()">🔊</button>
+
 <script>
-    const themeToggleBtn = document.getElementById("themeToggle");
-    function setTheme(theme) {
-        if (theme === "dark") { document.body.classList.add("dark"); themeToggleBtn.textContent = "🌙"; }
-        else { document.body.classList.remove("dark"); themeToggleBtn.textContent = "🌞"; }
-        localStorage.setItem("alfacel-theme", theme);
+    let audioEnabled = false;
+    const bgAudio = document.getElementById("bg-audio");
+    const audioBtn = document.getElementById("audioToggle");
+
+    function toggleAudio() {
+        audioEnabled = !audioEnabled;
+        audioBtn.innerText = audioEnabled ? "🔊" : "🔇";
+        if (audioEnabled) {
+            bgAudio.play().catch(e => console.log("Autoplay bloqueado"));
+        } else {
+            bgAudio.pause();
+        }
     }
-    function initTheme() {
-        const savedTheme = localStorage.getItem("alfacel-theme");
-        if (savedTheme) setTheme(savedTheme);
-        else setTheme(window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+
+    function navegar(url) {
+        window.location.href = url;
     }
-    themeToggleBtn.addEventListener("click", () => setTheme(document.body.classList.contains("dark") ? "light" : "dark"));
-    window.addEventListener("load", () => {
-        initTheme();
-        confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, colors: ['#ff6f61', '#ffca28', '#42a5f5', '#66bb6a', '#ab47bc'] });
-    });
+
+    // Criar bolhas decorativas
+    function criarBolhas() {
+        for(let i = 0; i < 25; i++) {
+            setTimeout(() => {
+                const bolha = document.createElement("div");
+                bolha.className = "bubble";
+                const tamanho = Math.random() * 35 + 8;
+                bolha.style.width = tamanho + "px";
+                bolha.style.height = tamanho + "px";
+                bolha.style.left = Math.random() * 100 + "%";
+                bolha.style.animationDuration = Math.random() * 5 + 3 + "s";
+                bolha.style.animationDelay = Math.random() * 5 + "s";
+                document.body.appendChild(bolha);
+                setTimeout(() => bolha.remove(), 10000);
+            }, i * 150);
+        }
+    }
+
+    // Desbloquear áudio no mobile
+    let vozDesbloqueada = false;
+    const desbloquearAudio = () => {
+        if (!vozDesbloqueada) {
+            vozDesbloqueada = true;
+            if (audioEnabled) {
+                bgAudio.play().catch(e=>{});
+            }
+            document.removeEventListener('touchstart', desbloquearAudio);
+            document.removeEventListener('click', desbloquearAudio);
+        }
+    };
+    document.addEventListener('touchstart', desbloquearAudio, { once: true });
+    document.addEventListener('click', desbloquearAudio, { once: true });
+
+    // Inicializar
+    window.onload = () => {
+        criarBolhas();
+        setInterval(criarBolhas, 8000);
+    };
 </script>
 </body>
 </html>
