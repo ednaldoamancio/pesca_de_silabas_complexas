@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Alfacel – Alfabeto Mágico</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+    <style>
+        :root {
+            --primary: #ff6f61;
+            --secondary: #ffca28;
+            --accent-blue: #42a5f5;
+            --accent-green: #66bb6a;
+            --accent-purple: #ab47bc;
+            --bg-soft: #f3e9d7;
+            --text: #3e2723;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg-soft);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 960px;
+            min-height: 100vh;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Folha pautada suave */
+        .card {
+            position: relative;
+            background-color: #fffdf8;
+            border-radius: 18px;
+            padding: 22px 16px 22px;
+            text-align: center;
+            box-shadow:
+                0 16px 40px rgba(0,0,0,0.16),
+                0 0 0 4px rgba(255,255,255,0.9);
+            overflow: hidden;
+            background-image:
+                repeating-linear-gradient(
+                    to bottom,
+                    #fffdf8 0px,
+                    #fffdf8 28px,
+                    #d6e2f5 29px
+                );
+            background-size: 100% 29px;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 52px;
+            width: 2px;
+            background: rgba(255, 82, 82, 0.5);
+        }
+
+        .stamp {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            border: 2px dashed rgba(0,0,0,0.16);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: rgba(0,0,0,0.7);
+            transform: rotate(-5deg);
+            opacity: 0.85;
+            background: rgba(255,255,255,0.9);
+        }
+
+        .stamp-1 {
+            top: 14px;
+            right: 20px;
+        }
+
+        .stamp-2 {
+            bottom: 14px;
+            left: 12px;
+            transform: rotate(6deg);
+        }
+
+        @media (min-width: 720px) {
+            .card {
+                padding: 26px 28px 26px;
+            }
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 11px;
+            color: rgba(62,39,35,0.9);
+            margin-bottom: 6px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .badge-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--secondary);
+            box-shadow: 0 0 0 4px rgba(255,202,40,0.4);
+        }
+
+        /* Botão modo claro/escuro */
+        .theme-toggle {
+            position: absolute;
+            top: 10px;
+            left: 14px;
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            border: 1px solid rgba(0,0,0,0.12);
+            background: #ffffffcc;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .title {
+            font-size: clamp(24px, 5vw, 32px);
+            color: var(--primary);
+            font-weight: 900;
+            margin-bottom: 4px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text);
+            opacity: 0.95;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stage {
+            min-height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            margin: 10px 0 14px;
+            z-index: 1;
+        }
+
+        .big-letter {
+            font-size: clamp(130px, 34vw, 220px);
+            font-weight: 900;
+            line-height: 1;
+            color: var(--primary);
+            text-shadow:
+                0 0 0 rgba(0,0,0,0.1),
+                0 12px 22px rgba(0,0,0,0.18);
+            opacity: 0;
+            transform: scale(0.1) translateY(40px);
+        }
+
+        .big-letter.flash-in {
+            animation: flashIn 0.9s ease-out forwards;
+        }
+
+        @keyframes flashIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.1) translateY(40px);
+            }
+            40% {
+                opacity: 1;
+                transform: scale(1.1) translateY(0);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .big-letter.pop {
+            animation: popOnce 0.45s ease-out;
+        }
+
+        @keyframes popOnce {
+            0% { transform: scale(0.9); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .alphabet-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 8px;
+            justify-items: center;
+            margin: 4px 0 6px;
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (max-width: 640px) {
+            .alphabet-grid {
+                grid-template-columns: repeat(6, minmax(0, 1fr));
+            }
+        }
+
+        .letter-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            border: none;
+            font-size: 24px;
+            font-weight: 800;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.16);
+            transition: transform 0.12s ease, box-shadow 0.12s ease, outline 0.12s ease;
+            outline: 2px solid transparent;
+        }
+
+        .letter-btn:active {
+            transform: translateY(2px) scale(0.96);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+        }
+
+        .letter-btn:focus-visible {
+            outline: 2px solid #00000066;
+        }
+
+        .c1 { background: linear-gradient(135deg, #ff8a65, #ffb74d); }
+        .c2 { background: linear-gradient(135deg, #4fc3f7, #64b5f6); }
+        .c3 { background: linear-gradient(135deg, #81c784, #aed581); }
+        .c4 { background: linear-gradient(135deg, #ba68c8, #f06292); }
+
+        .controls {
+            font-size: 12px;
+            color: rgba(62,39,35,0.8);
+            margin-top: 4px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .controls kbd {
+            background: rgba(0,0,0,0.05);
+            border-radius: 4px;
+            padding: 2px 5px;
+            font-size: 11px;
+        }
+
+        .btn-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn {
+            padding: 7px 14px;
+            border-radius: 999px;
+            border: none;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.18);
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: #ffffff;
+            color: var(--text);
+            border: 1px solid rgba(0,0,0,0.08);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+        }
+
+        .hint {
+            font-size: 13px;
+            color: rgba(62,39,35,0.85);
+            margin-top: 6px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Tema escuro (modo noturno) */
+        body.dark {
+            background: #101017;
+            color: #f5f5f5;
+        }
+
+        body.dark .card {
+            background-color: #181824;
+            box-shadow:
+                0 16px 40px rgba(0,0,0,0.7),
+                0 0 0 2px rgba(255,255,255,0.06);
+            background-image:
+                repeating-linear-gradient(
+                    to bottom,
+                    #181824 0px,
+                    #181824 28px,
+                    #2a3142 29px
+                );
+        }
+
+        body.dark .card::before {
+            background: rgba(255, 138, 101, 0.7);
+        }
+
+        body.dark .stamp {
+            border-color: rgba(255,255,255,0.15);
+            background: rgba(18,18,28,0.95);
+            color: rgba(255,255,255,0.8);
+        }
+
+        body.dark .title {
+            color: #ffb74d;
+        }
+
+        body.dark .subtitle,
+        body.dark .controls,
+        body.dark .hint {
+            color: rgba(250,250,250,0.9);
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <div class="card">
+        <button class="theme-toggle" id="themeToggle" aria-label="Alternar modo noturno">
+            🌞
+        </button>
+
+        <div class="stamp stamp-1">🏝️</div>
+        <div class="stamp stamp-2">📬</div>
+
+        <div class="badge">
+            <span class="badge-dot"></span>
+            <span>Alfacel – Alfabeto maiúsculo animado</span>
+        </div>
+
+        <h1 class="title">Alfabeto Mágico</h1>
+        <p class="subtitle" id="subtitle">
+            As letras vão aparecer bem grandes, uma de cada vez, e falar o seu nome.
+        </p>
+
+        <div class="stage" aria-live="polite">
+            <div id="bigLetter" class="big-letter" aria-label="Letra atual"></div>
+        </div>
+
+        <div class="alphabet-grid" id="alphabetGrid" aria-label="Todas as letras do alfabeto">
+            <!-- Letras A–Z serão inseridas via JavaScript -->
+        </div>
+
+        <p class="hint" id="hint">
+            Toque em uma letra para vê-la grande e ouvir o som novamente.
+        </p>
+
+        <p class="controls">
+            Clique em ▶ <strong>Apresentar alfabeto</strong> ou use o teclado:
+            <kbd>→</kbd> próxima letra, <kbd>←</kbd> letra anterior.
+        </p>
+
+        <div class="btn-row">
+            <button class="btn btn-primary" id="btnPlaySequence">
+                ▶ Apresentar alfabeto
+            </button>
+            <button class="btn btn-secondary" id="btnRepeat">
+                🔁 Repetir letra atual
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Web Speech API em pt-BR [web:24][web:68]
+    const synth = window.speechSynthesis;
+    let voices = [];
+    let voicePtBr = null;
+
+    function loadVoices() {
+        voices = synth.getVoices();
+        voicePtBr = voices.find(v => v.lang && v.lang.toLowerCase().startsWith("pt-br")) || null;
+    }
+
+    loadVoices();
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    function speak(text, rate = 0.85, pitch = 1.1) {
+        if (!text) return;
+        synth.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = "pt-BR";
+        if (voicePtBr) u.voice = voicePtBr;
+        u.rate = rate;
+        u.pitch = pitch;
+        synth.speak(u);
+    }
+
+    // Letras A–Z
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+    const bigLetterEl = document.getElementById("bigLetter");
+    const gridEl = document.getElementById("alphabetGrid");
+    const btnPlaySequence = document.getElementById("btnPlaySequence");
+    const btnRepeat = document.getElementById("btnRepeat");
+    const themeToggleBtn = document.getElementById("themeToggle");
+
+    let currentIndex = 0;
+    let playingSequence = false;
+
+    // Cria os botões de letras
+    letters.forEach((letter, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "letter-btn " + ["c1","c2","c3","c4"][idx % 4];
+        btn.textContent = letter;
+        btn.setAttribute("data-letter", letter);
+        btn.setAttribute("aria-label", "Letra " + letter);
+        gridEl.appendChild(btn);
+    });
+
+    function showLetter(index, animateFlash = true) {
+        if (index < 0 || index >= letters.length) return;
+        currentIndex = index;
+        const letter = letters[index];
+        bigLetterEl.textContent = letter;
+        bigLetterEl.classList.remove("flash-in", "pop");
+        void bigLetterEl.offsetWidth;
+        bigLetterEl.style.opacity = "1";
+        bigLetterEl.classList.add(animateFlash ? "flash-in" : "pop");
+    }
+
+    function speakCurrentLetterName() {
+        const letter = letters[currentIndex];
+        speak(letter, 0.85, 1.1);
+    }
+
+    function playSequence() {
+        if (playingSequence) return;
+        playingSequence = true;
+        let i = 0;
+
+        function next() {
+            if (!playingSequence) return;
+            if (i >= letters.length) {
+                playingSequence = false;
+                return;
+            }
+            showLetter(i, true);
+            speak(letters[i], 0.85, 1.1);
+            i++;
+            setTimeout(next, 1100);
+        }
+        next();
+    }
+
+    // Clique em uma letra
+    gridEl.addEventListener("click", (e) => {
+        const btn = e.target.closest(".letter-btn");
+        if (!btn) return;
+        const letter = btn.getAttribute("data-letter");
+        const index = letters.indexOf(letter);
+        if (index === -1) return;
+        playingSequence = false;
+        showLetter(index, false);
+        speak(letter, 0.85, 1.1);
+    });
+
+    // Botões principais
+    btnPlaySequence.addEventListener("click", () => {
+        playSequence();
+    });
+
+    btnRepeat.addEventListener("click", () => {
+        speakCurrentLetterName();
+    });
+
+    // Teclado
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight") {
+            e.preventDefault();
+            playingSequence = false;
+            const nextIndex = (currentIndex + 1) % letters.length;
+            showLetter(nextIndex, false);
+            speakCurrentLetterName();
+        } else if (e.key === "ArrowLeft") {
+            e.preventDefault();
+            playingSequence = false;
+            const prevIndex = (currentIndex - 1 + letters.length) % letters.length;
+            showLetter(prevIndex, false);
+            speakCurrentLetterName();
+        } else {
+            const key = e.key.toUpperCase();
+            if (letters.includes(key)) {
+                playingSequence = false;
+                showLetter(letters.indexOf(key), false);
+                speak(key, 0.85, 1.1);
+            }
+        }
+    });
+
+    // ---------- MODO NOTURNO ----------
+    function setTheme(theme) {
+        if (theme === "dark") {
+            document.body.classList.add("dark");
+            themeToggleBtn.textContent = "🌙";
+            themeToggleBtn.setAttribute("aria-label", "Alternar para modo claro");
+        } else {
+            document.body.classList.remove("dark");
+            themeToggleBtn.textContent = "🌞";
+            themeToggleBtn.setAttribute("aria-label", "Alternar para modo noturno");
+        }
+        localStorage.setItem("alfacel-theme", theme);
+    }
+
+    function initTheme() {
+        const saved = localStorage.getItem("alfacel-theme");
+        if (saved === "dark" || saved === "light") {
+            setTheme(saved);
+        } else {
+            const prefersDark = window.matchMedia &&
+                window.matchMedia("(prefers-color-scheme: dark)").matches;
+            setTheme(prefersDark ? "dark" : "light");
+        }
+    }
+
+    themeToggleBtn.addEventListener("click", () => {
+        const isDark = document.body.classList.contains("dark");
+        setTheme(isDark ? "light" : "dark");
+    });
+
+    // Inicialização
+    window.addEventListener("load", () => {
+        initTheme();           // aplica tema salvo
+        showLetter(0, false);  // começa mostrando A
+    });
+</script>
+</body>
+</html>
+
