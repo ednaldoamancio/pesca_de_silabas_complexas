@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Sílabas Complexas - Tesouros do Mar Profundo | EdHumanas</title>
+    
+    <style>
+        :root {
+            --primary: #00acc1;
+            --secondary: #ffd54f;
+            --accent: #ff7043;
+            --gold: #ffb74d;
+            --text-light: #ffffff;
+            --deep-blue: #0d1b2a;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            user-select: none; 
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Comic Neue', 'Comic Sans MS', Tahoma, sans-serif;
+            background: #000;
+            color: var(--text-light);
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: fixed;
+            touch-action: manipulation;
+        }
+
+        .custom-cursor {
+            position: fixed;
+            width: 45px;
+            height: 45px;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.05s ease;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
+        }
+        
+        .custom-cursor::before {
+            content: "🔱";
+            font-size: 40px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        @media (hover: none) and (pointer: coarse) {
+            .custom-cursor {
+                display: none;
+            }
+            body {
+                cursor: auto;
+            }
+        }
+
+        #bg-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            opacity: 0.6;
+            filter: brightness(0.8) contrast(1.1) saturate(1.2);
+            pointer-events: none;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0,20,50,0.7), rgba(0,5,20,0.85));
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .light-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .light-particle {
+            position: absolute;
+            background: radial-gradient(circle, rgba(255,255,200,0.6), transparent);
+            border-radius: 50%;
+            animation: floatLight 8s ease-in-out infinite;
+        }
+        
+        @keyframes floatLight {
+            0% { transform: translateY(100vh) translateX(0) scale(0); opacity: 0; }
+            20% { opacity: 0.8; }
+            100% { transform: translateY(-20vh) translateX(100px) scale(1.5); opacity: 0; }
+        }
+
+        #game-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            pointer-events: none;
+        }
+
+        .top-bar {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 100;
+            display: flex;
+            gap: 10px;
+            pointer-events: auto;
+        }
+        
+        .icon-btn {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid var(--gold);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+            transition: transform 0.2s;
+        }
+        
+        @media (min-width: 768px) {
+            .icon-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+            }
+            .top-bar {
+                top: 20px;
+                left: 20px;
+                gap: 15px;
+            }
+        }
+
+        .game-info-container {
+            width: 100%;
+            padding-top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .game-info {
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 10, 25, 0.85);
+            padding: 6px 15px;
+            border-radius: 40px;
+            border: 2px solid var(--primary);
+            font-weight: bold;
+            font-size: 11px;
+            backdrop-filter: blur(4px);
+            flex-wrap: wrap;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        @media (min-width: 768px) {
+            .game-info {
+                gap: 20px;
+                padding: 10px 25px;
+                font-size: 18px;
+            }
+        }
+        
+        .timer {
+            background: #000000aa;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #00ffcc;
+        }
+
+        .instrucao { 
+            font-size: 16px;
+            font-weight: 900;
+            margin-top: 8px;
+            background: rgba(0,0,0,0.75);
+            padding: 6px 14px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            cursor: pointer;
+            pointer-events: auto;
+            border: 1px solid var(--gold);
+        }
+        
+        @media (min-width: 768px) {
+            .instrucao {
+                font-size: 24px;
+                margin-top: 15px;
+                padding: 8px 20px;
+                gap: 10px;
+            }
+        }
+        
+        #silabaAlvo {
+            color: var(--gold);
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #1a2a3a, #0a1a2a);
+            padding: 0 15px;
+            border-radius: 40px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 8px #ff9800;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: transform 0.15s ease, text-shadow 0.15s ease;
+            border: 1px solid var(--primary);
+        }
+        
+        #silabaAlvo.pulsando {
+            transform: scale(1.25);
+            text-shadow: 0 0 20px #ffca28, 0 0 10px #ff9800;
+            border-color: var(--gold);
+        }
+
+        .oceano {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            overflow: visible;
+            pointer-events: auto;
+        }
+
+        .creature {
+            position: absolute;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100px;
+            height: 100px;
+            pointer-events: auto;
+            transition: filter 0.1s, transform 0.05s;
+            filter: brightness(1.1) saturate(1.1);
+            z-index: 50;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .creature:active {
+            transform: scale(0.95);
+        }
+        
+        .creature::after {
+            content: "";
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            background: transparent;
+            border-radius: 50%;
+            pointer-events: auto;
+        }
+        
+        @media (min-width: 768px) {
+            .creature {
+                width: 120px;
+                height: 120px;
+            }
+        }
+        
+        .creature-icon {
+            font-size: 65px;
+            position: absolute;
+            z-index: 1;
+            filter: drop-shadow(3px 6px 10px rgba(0,0,0,0.5));
+            pointer-events: none;
+            transition: all 0.2s;
+        }
+        
+        @media (min-width: 768px) {
+            .creature-icon {
+                font-size: 85px;
+            }
+        }
+        
+        .silaba-creature {
+            font-size: 18px;
+            font-weight: bold;
+            color: #FFFDE7;
+            background: rgba(0,0,0,0.65);
+            padding: 5px 10px;
+            border-radius: 30px;
+            position: absolute;
+            z-index: 2;
+            text-shadow: 1px 1px 0 #0a2f5a;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1.5px;
+            pointer-events: none;
+            white-space: nowrap;
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255,215,0,0.5);
+        }
+        
+        @media (min-width: 768px) {
+            .silaba-creature {
+                font-size: 26px;
+                padding: 6px 14px;
+            }
+        }
+
+        .pescado {
+            animation: subir-vertical 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+            pointer-events: none !important;
+            z-index: 300;
+            filter: brightness(1.5) !important;
+        }
+
+        @keyframes subir-vertical {
+            0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: translateY(-50vh) scale(1.2) rotate(10deg); opacity: 0.8; }
+            100% { transform: translateY(-120vh) scale(0.3) rotate(20deg); opacity: 0; }
+        }
+
+        @keyframes nadar-direita {
+            0% { left: -120px; }
+            100% { left: 100%; }
+        }
+        @keyframes nadar-esquerda {
+            0% { left: 100%; }
+            100% { left: -120px; }
+        }
+        
+        @media (min-width: 768px) {
+            @keyframes nadar-direita {
+                0% { left: -150px; }
+                100% { left: 100%; }
+            }
+            @keyframes nadar-esquerda {
+                0% { left: 100%; }
+                100% { left: -150px; }
+            }
+        }
+
+        .treasure-effect {
+            position: absolute;
+            font-size: 40px;
+            pointer-events: none;
+            z-index: 200;
+            animation: treasureFloat 0.8s ease-out forwards;
+        }
+        
+        @keyframes treasureFloat {
+            0% { transform: scale(0.2) translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: scale(1.5) translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        .bolha {
+            position: absolute;
+            bottom: -50px;
+            background: radial-gradient(circle, rgba(100,200,255,0.5), rgba(50,100,200,0.2));
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 15;
+            animation: subir-bolha linear forwards;
+        }
+        
+        @keyframes subir-bolha {
+            to { transform: translateY(-120vh) translateX(60px); opacity: 0; }
+        }
+        
+        .shockwave {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,215,0,0.8), transparent);
+            pointer-events: none;
+            z-index: 150;
+            animation: expandWave 0.5s ease-out forwards;
+        }
+        
+        @keyframes expandWave {
+            0% { transform: scale(0.5); opacity: 0.8; }
+            100% { transform: scale(8); opacity: 0; }
+        }
+
+        #modal-vitoria, #modal-navegacao {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,10,25,0.98);
+            backdrop-filter: blur(14px);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .vitoria-texto {
+            font-size: 4vh;
+            color: var(--gold);
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        
+        .icone-vitoria { font-size: 12vh; margin-bottom: 15px; animation: float 2s infinite; }
+        
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
+        
+        .score-panel { 
+            font-size: 16px; 
+            background: linear-gradient(135deg, #1e2a3a, #0a1520);
+            padding: 8px 20px; 
+            border-radius: 60px; 
+            margin-top: 15px; 
+            border: 1px solid var(--gold);
+        }
+        
+        .tempo-record {
+            font-size: 14px;
+            margin-top: 10px;
+            color: var(--accent);
+        }
+
+        .erro-anim {
+            animation: tremer 0.3s ease;
+            filter: grayscale(0.5) brightness(0.6);
+        }
+        
+        @keyframes tremer {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px) rotate(-3deg); }
+            75% { transform: translateX(8px) rotate(3deg); }
+        }
+        
+        .feedback-correto {
+            position: fixed;
+            bottom: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2e7d32ee;
+            backdrop-filter: blur(8px);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 20px;
+            font-weight: bold;
+            z-index: 200;
+            animation: fadeUp 0.9s ease-out forwards;
+            pointer-events: none;
+            white-space: nowrap;
+            border: 2px solid var(--gold);
+        }
+        
+        @keyframes fadeUp {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            20% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-50px); }
+        }
+
+        .progresso-categoria {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            padding: 6px 12px;
+            border-radius: 25px;
+            font-size: 10px;
+            backdrop-filter: blur(5px);
+            font-weight: bold;
+            pointer-events: none;
+            color: var(--gold);
+            text-align: right;
+        }
+        
+        @media (min-width: 768px) {
+            .progresso-categoria {
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 18px;
+                font-size: 14px;
+            }
+        }
+        
+        .btn-voltar {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background: linear-gradient(135deg, #00acc1, #006064);
+            border: none;
+            border-radius: 40px;
+            padding: 10px 18px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(4px);
+            pointer-events: auto;
+            transition: all 0.3s;
+        }
+        
+        @media (min-width: 768px) {
+            .btn-voltar {
+                bottom: 30px;
+                left: 30px;
+                padding: 14px 28px;
+                font-size: 18px;
+            }
+        }
+        
+        .btn-voltar:active {
+            transform: scale(0.95);
+        }
+        
+        .dica-som {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.5);
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 9px;
+            color: #aaa;
+            pointer-events: none;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .nav-btn {
+            background: linear-gradient(135deg, #00acc1, #006064);
+            border: 2px solid var(--gold);
+            padding: 12px 24px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 40px;
+            cursor: pointer;
+            color: white;
+        }
+        
+        .nav-btn.cancelar {
+            background: linear-gradient(135deg, #555, #333);
+            border-color: #888;
+        }
+    </style>
+</head>
+<body>
+
+<video autoplay loop muted playsinline id="bg-video">
+    <source src="fundo-do-mar.mp4" type="video/mp4">
+</video>
+
+<div class="light-particles" id="lightParticles"></div>
+
+<audio id="bg-audio" src="som_fundo_do_mar.mp3" loop></audio>
+<audio id="sfx-pescado" src="pescado.ogg"></audio>
+<audio id="sfx-erro" src="erro.mp3"></audio>
+
+<div id="game-wrapper">
+    <div class="top-bar">
+        <button class="icon-btn" onclick="window.location.href='index.html'">⬅️</button>
+        <button id="btn-audio" class="icon-btn" onclick="toggleAudio()">🔇</button>
+        <button class="icon-btn" onclick="toggleFullscreen()">⛶</button>
+    </div>
+
+    <div class="game-info-container">
+        <div class="game-info">
+            <div>🏺 Etapa: <span id="faseText">1</span>/25</div>
+            <div>✨ Pontos: <span id="pontosText">0</span></div>
+            <div>🐚 Progresso: <span id="acertosFase">0</span>/<span id="totalEtapa">0</span></div>
+            <div>📖 Categoria: <span id="categoriaAtual">Sílabas</span></div>
+            <div class="timer">⏱️ <span id="timerDisplay">00:00</span></div>
+        </div>
+        <p class="instrucao" id="btnRepetirSilaba">
+            🌊 Pesque a sílaba: <span id="silabaAlvo">---</span> 🔊
+        </p>
+    </div>
+    <div class="oceano" id="aquario"></div>
+    <div class="progresso-categoria" id="progressHint">🏆 Tesouros do Mar Profundo</div>
+    
+    <button class="btn-voltar" id="btnVoltar">
+        <span>🏝️</span> Voltar ao Menu
+    </button>
+    
+    <div class="dica-som">💡 Clique na sílaba para ouvir | Pesque os tesouros!</div>
+</div>
+
+<div id="modal-vitoria">
+    <div class="icone-vitoria">🏆🗿🏆</div>
+    <div class="vitoria-texto" id="vitoria-msg-topo">Parabéns, Mestre do Mar!</div>
+    <div class="score-panel" id="scoreFinalModal">Pontuação: 0</div>
+    <div class="tempo-record" id="tempoEtapa"></div>
+    <div class="vitoria-texto" id="vitoria-msg-sub" style="font-size: 2.5vh; color: #88ccff;">Descobrindo novos tesouros...</div>
+</div>
+
+<div id="modal-navegacao">
+    <div class="icone-vitoria">🐢➡️🏝️</div>
+    <div class="vitoria-texto" style="font-size: 3.5vh;">Voltar para o menu principal?</div>
+    <div class="nav-buttons">
+        <button class="nav-btn cancelar" id="btnCancelarVolta">❌ Continuar</button>
+        <button class="nav-btn confirmar" id="btnConfirmarVolta">🏝️ Voltar ao Menu</button>
+    </div>
+</div>
+
+<script>
+    // ========== SÍLABAS COMPLEXAS ORGANIZADAS POR CATEGORIA ==========
+    const categorias = [
+        { nome: "🌊 AL - EL - IL - OL - UL", silabas: ["AL", "EL", "IL", "OL", "UL"] },
+        { nome: "🐚 AM - EM - IM - OM - UM", silabas: ["AM", "EM", "IM", "OM", "UM"] },
+        { nome: "🪸 AN - EN - IN - ON - UN", silabas: ["AN", "EN", "IN", "ON", "UN"] },
+        { nome: "⭐ AR - ER - IR - OR - UR", silabas: ["AR", "ER", "IR", "OR", "UR"] },
+        { nome: "🌀 AS - ES - IS - OS - US", silabas: ["AS", "ES", "IS", "OS", "US"] },
+        { nome: "🐙 BLA - BLE - BLI - BLO - BLU", silabas: ["BLA", "BLE", "BLI", "BLO", "BLU"] },
+        { nome: "🦑 BRA - BRE - BRI - BRO - BRU", silabas: ["BRA", "BRE", "BRI", "BRO", "BRU"] },
+        { nome: "🐠 CLA - CLE - CLI - CLO - CLU", silabas: ["CLA", "CLE", "CLI", "CLO", "CLU"] },
+        { nome: "🐡 CRA - CRE - CRI - CRO - CRU", silabas: ["CRA", "CRE", "CRI", "CRO", "CRU"] },
+        { nome: "🐋 DRA - DRE - DRI - DRO - DRU", silabas: ["DRA", "DRE", "DRI", "DRO", "DRU"] },
+        { nome: "🦈 FLA - FLE - FLI - FLO - FLU", silabas: ["FLA", "FLE", "FLI", "FLO", "FLU"] },
+        { nome: "🐬 FRA - FRE - FRI - FRO - FRU", silabas: ["FRA", "FRE", "FRI", "FRO", "FRU"] },
+        { nome: "🐳 GLA - GLE - GLI - GLO - GLU", silabas: ["GLA", "GLE", "GLI", "GLO", "GLU"] },
+        { nome: "🦀 GRA - GRE - GRI - GRO - GRU", silabas: ["GRA", "GRE", "GRI", "GRO", "GRU"] },
+        { nome: "🪼 PLA - PLE - PLI - PLO - PLU", silabas: ["PLA", "PLE", "PLI", "PLO", "PLU"] },
+        { nome: "🐙 PRA - PRE - PRI - PRO - PRU", silabas: ["PRA", "PRE", "PRI", "PRO", "PRU"] },
+        { nome: "🦑 RRA - RRE - RRI - RRO - RRU", silabas: ["RRA", "RRE", "RRI", "RRO", "RRU"] },
+        { nome: "🐠 SSA - SSE - SSI - SSO - SSU", silabas: ["SSA", "SSE", "SSI", "SSO", "SSU"] },
+        { nome: "🐡 TLA - TLE - TLI - TLO - TLU", silabas: ["TLA", "TLE", "TLI", "TLO", "TLU"] },
+        { nome: "🦭 TRA - TRE - TRI - TRO - TRU", silabas: ["TRA", "TRE", "TRI", "TRO", "TRU"] },
+        { nome: "🐢 VLA - VLE - VLI - VLO - VLU", silabas: ["VLA", "VLE", "VLI", "VLO", "VLU"] },
+        { nome: "🐚 VRA - VRE - VRI - VRO - VRU", silabas: ["VRA", "VRE", "VRI", "VRO", "VRU"] },
+        { nome: "🌟 NHA - NHE - NHI - NHO - NHU", silabas: ["NHA", "NHE", "NHI", "NHO", "NHU"] },
+        { nome: "⭐ LHA - LHE - LHI - LHO - LHU", silabas: ["LHA", "LHE", "LHI", "LHO", "LHU"] },
+        { nome: "🏆 CHA - CHE - CHI - CHO - CHU", silabas: ["CHA", "CHE", "CHI", "CHO", "CHU"] }
+    ];
+    
+    // Criaturas marinhas variadas
+    const criaturas = [
+        "🐟", "🐠", "🐡", "🐋", "🦈", "🐙", "🐬", "🐳", "🦀", "🦑", 
+        "🐚", "🦭", "🪼", "🐢", "🐠", "🐟", "🐡", "🐙", "🦞", "🪸",
+        "🧜‍♀️", "🧜‍♂️", "🐠", "🐟", "🦑", "🐢", "🐋", "🦀", "🐡", "🐬"
+    ];
+    
+    // ========== CORREÇÃO DAS PRONÚNCIAS ==========
+    // Agora sem acentos agudos indevidos: "OL" = "ou", "EL" = "éu", "UL" = "uu", etc.
+    const pronunciaComplexa = {
+        // Série AL-EL-IL-OL-UL
+        "AL": "au", "EL": "éu", "IL": "iu", "OL": "ou", "UL": "uu",
+        
+        // Série AM-EM-IM-OM-UM
+        "AM": "ã", "EM": "ẽ", "IM": "ĩ", "OM": "õ", "UM": "ũ",
+        
+        // Série AN-EN-IN-ON-UN
+        "AN": "ã", "EN": "ẽ", "IN": "ĩ", "ON": "õ", "UN": "ũ",
+        
+        // Série AR-ER-IR-OR-UR
+        "AR": "ar", "ER": "er", "IR": "ir", "OR": "or", "UR": "ur",
+        
+        // Série AS-ES-IS-OS-US
+        "AS": "as", "ES": "es", "IS": "is", "OS": "os", "US": "us",
+        
+        // Encontros consonantais com L
+        "BLA": "bla", "BLE": "ble", "BLI": "bli", "BLO": "blo", "BLU": "blu",
+        "BRA": "bra", "BRE": "bre", "BRI": "bri", "BRO": "bro", "BRU": "bru",
+        "CLA": "cla", "CLE": "cle", "CLI": "cli", "CLO": "clo", "CLU": "clu",
+        "CRA": "cra", "CRE": "cre", "CRI": "cri", "CRO": "cro", "CRU": "cru",
+        "DRA": "dra", "DRE": "dre", "DRI": "dri", "DRO": "dro", "DRU": "dru",
+        "FLA": "fla", "FLE": "fle", "FLI": "fli", "FLO": "flo", "FLU": "flu",
+        "FRA": "fra", "FRE": "fre", "FRI": "fri", "FRO": "fro", "FRU": "fru",
+        "GLA": "gla", "GLE": "gle", "GLI": "gli", "GLO": "glo", "GLU": "glu",
+        "GRA": "gra", "GRE": "gre", "GRI": "gri", "GRO": "gro", "GRU": "gru",
+        "PLA": "pla", "PLE": "ple", "PLI": "pli", "PLO": "plo", "PLU": "plu",
+        "PRA": "pra", "PRE": "pre", "PRI": "pri", "PRO": "pro", "PRU": "pru",
+        
+        // Consoantes duplas
+        "RRA": "rrá", "RRE": "rré", "RRI": "rri", "RRO": "rró", "RRU": "rru",
+        "SSA": "ssá", "SSE": "ssé", "SSI": "ssi", "SSO": "ssó", "SSU": "ssu",
+        
+        // Encontros com T
+        "TLA": "tla", "TLE": "tle", "TLI": "tli", "TLO": "tlo", "TLU": "tlu",
+        "TRA": "tra", "TRE": "tre", "TRI": "tri", "TRO": "tro", "TRU": "tru",
+        
+        // Encontros com V
+        "VLA": "vla", "VLE": "vle", "VLI": "vli", "VLO": "vlo", "VLU": "vlu",
+        "VRA": "vra", "VRE": "vre", "VRI": "vri", "VRO": "vro", "VRU": "vru",
+        
+        // Dígrafos com NH
+        "NHA": "nha", "NHE": "nhe", "NHI": "nhi", "NHO": "nho", "NHU": "nhu",
+        
+        // Dígrafos com LH
+        "LHA": "lhá", "LHE": "lhé", "LHI": "lhi", "LHO": "lhó", "LHU": "lhu",
+        
+        // Dígrafos com CH
+        "CHA": "cha", "CHE": "che", "CHI": "chi", "CHO": "cho", "CHU": "chu"
+    };
+    
+    let audioEnabled = false;
+    let currentUtterance = null;
+    let jogoAtivo = true;
+    let aguardandoProxima = false;
+    let faseAtual = 1;
+    let pontuacaoTotal = 0;
+    let acertosNaEtapa = 0;
+    let filaSilabas = [];
+    let indiceSilabaAtual = 0;
+    let categoriaCorrente = categorias[0];
+    let criaturasNaTela = window.innerWidth < 768 ? 3 : (window.innerWidth < 1024 ? 4 : 5);
+    
+    let temposEtapas = Array(25).fill(0);
+    let tempoInicioEtapa = null;
+    let intervaloRelogio = null;
+    
+    const bgAudio = document.getElementById("bg-audio");
+    const sfxPescado = document.getElementById("sfx-pescado");
+    const sfxErro = document.getElementById("sfx-erro");
+    const btnAudio = document.getElementById("btn-audio");
+    const aquario = document.getElementById("aquario");
+    const modalVitoria = document.getElementById("modal-vitoria");
+    const modalNavegacao = document.getElementById("modal-navegacao");
+    
+    // ========== FUNÇÕES DE FALA ==========
+    function falar(texto, callback) {
+        if (!window.speechSynthesis) { if (callback) callback(); return; }
+        if (currentUtterance) window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(texto);
+        utterance.lang  = 'pt-BR';
+        utterance.rate  = 0.8;
+        utterance.pitch = 1.0;
+
+        const voices = window.speechSynthesis.getVoices();
+        const ptBrVoice = voices.find(v => v.lang === 'pt-BR' &&
+            (v.name.includes('Google') || v.name.includes('Microsoft') ||
+             v.name.includes('Maria')  || v.name.includes('Natural')));
+        if (ptBrVoice) utterance.voice = ptBrVoice;
+
+        currentUtterance = utterance;
+        utterance.onend = () => {
+            currentUtterance = null;
+            if (callback) setTimeout(callback, 150);
+        };
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function falarSilaba(silaba, callback) {
+        const pronuncia = pronunciaComplexa[silaba.toUpperCase()] || silaba.toLowerCase();
+        falar(pronuncia, callback);
+    }
+
+    function falarMensagem(msg, callback) {
+        falar(msg, callback);
+    }
+    
+    // ========== CRONÔMETRO ==========
+    function formatarTempo(segundos) {
+        const mins = Math.floor(segundos / 60);
+        const secs = segundos % 60;
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    
+    function iniciarCronometro() {
+        if (intervaloRelogio) clearInterval(intervaloRelogio);
+        tempoInicioEtapa = Date.now();
+        document.getElementById("timerDisplay").innerText = "00:00";
+        intervaloRelogio = setInterval(() => {
+            if (tempoInicioEtapa && jogoAtivo && !aguardandoProxima) {
+                const segundos = Math.floor((Date.now() - tempoInicioEtapa) / 1000);
+                document.getElementById("timerDisplay").innerText = formatarTempo(segundos);
+            }
+        }, 1000);
+    }
+    
+    function pararCronometro() {
+        if (intervaloRelogio) clearInterval(intervaloRelogio);
+        if (tempoInicioEtapa) return Math.floor((Date.now() - tempoInicioEtapa) / 1000);
+        return 0;
+    }
+    
+    function repetirSilabaAlvo() {
+        const elSilaba = document.getElementById("silabaAlvo");
+        const silabaAtual = elSilaba.innerText;
+        if (!silabaAtual || silabaAtual === "---") return;
+        elSilaba.classList.add("pulsando");
+        setTimeout(() => elSilaba.classList.remove("pulsando"), 300);
+        falarSilaba(silabaAtual);
+    }
+    
+    // ========== PARTÍCULAS DE LUZ ==========
+    function criarParticulasLuz() {
+        const container = document.getElementById("lightParticles");
+        for(let i = 0; i < 40; i++) {
+            setTimeout(() => {
+                const particle = document.createElement("div");
+                particle.className = "light-particle";
+                particle.style.width = Math.random() * 8 + 3 + "px";
+                particle.style.height = particle.style.width;
+                particle.style.left = Math.random() * 100 + "%";
+                particle.style.animationDelay = Math.random() * 10 + "s";
+                particle.style.animationDuration = Math.random() * 6 + 6 + "s";
+                container.appendChild(particle);
+                setTimeout(() => particle.remove(), 12000);
+            }, i * 300);
+        }
+    }
+    
+    // ========== EFEITOS VISUAIS ==========
+    function criarOndaChoque(x, y) {
+        const wave = document.createElement("div");
+        wave.className = "shockwave";
+        wave.style.left = (x - 15) + "px";
+        wave.style.top = (y - 15) + "px";
+        document.body.appendChild(wave);
+        setTimeout(() => wave.remove(), 500);
+    }
+    
+    function criarTesouro(x, y) {
+        const treasures = ["💎", "👑", "💰", "🗿", "⚓", "🔱", "🐚", "⭐", "🏆", "✨"];
+        const treasure = treasures[Math.floor(Math.random() * treasures.length)];
+        const elem = document.createElement("div");
+        elem.className = "treasure-effect";
+        elem.innerText = treasure;
+        elem.style.left = (x - 25) + "px";
+        elem.style.top = (y - 25) + "px";
+        document.body.appendChild(elem);
+        setTimeout(() => elem.remove(), 800);
+    }
+    
+    function criarEfeitoBolhas(quantidade = 30) {
+        for(let i = 0; i < quantidade; i++) {
+            setTimeout(() => {
+                const bolha = document.createElement("div");
+                bolha.className = "bolha";
+                const tam = Math.random() * 25 + 10 + "px";
+                bolha.style.width = tam; bolha.style.height = tam;
+                bolha.style.left = Math.random() * 100 + "vw";
+                bolha.style.animationDuration = Math.random() * 3 + 2.5 + "s";
+                document.body.appendChild(bolha);
+                setTimeout(() => bolha.remove(), 5500);
+            }, i * 50);
+        }
+    }
+    
+    function mostrarTesouroFeedback(x, y) {
+        criarTesouro(x, y);
+        criarOndaChoque(x, y);
+    }
+    
+    function mostrarFeedback(texto, isAcerto, x, y) {
+        const div = document.createElement("div");
+        div.className = "feedback-correto";
+        div.style.background = isAcerto ? "#2e7d32ee" : "#c62828ee";
+        div.style.border = isAcerto ? "2px solid #ffd700" : "2px solid #ff6f00";
+        div.innerText = isAcerto ? `🎣✨ +15 ⭐ ${texto} ✨` : `❌ ${texto}`;
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 850);
+        if(isAcerto && x) mostrarTesouroFeedback(x, y);
+    }
+    
+    // ========== LÓGICA DO JOGO ==========
+    function atualizarUI() {
+        document.getElementById("faseText").innerHTML = faseAtual;
+        document.getElementById("pontosText").innerHTML = pontuacaoTotal;
+        document.getElementById("acertosFase").innerHTML = acertosNaEtapa;
+        document.getElementById("totalEtapa").innerHTML = filaSilabas.length;
+        document.getElementById("categoriaAtual").innerHTML = categoriaCorrente.nome;
+        
+        let progressMsg = `🏆 ${categoriaCorrente.nome.substring(0, 20)} | ${acertosNaEtapa}/${filaSilabas.length}`;
+        document.getElementById("progressHint").innerHTML = progressMsg;
+    }
+    
+    function carregarProximaSilaba() {
+        if (indiceSilabaAtual >= filaSilabas.length) { concluirEtapa(); return; }
+        const silabaCerta = filaSilabas[indiceSilabaAtual];
+        document.getElementById("silabaAlvo").innerText = silabaCerta;
+        atualizarUI();
+        aquario.innerHTML = "";
+        
+        let opcoes = [silabaCerta];
+        let todasSilabas = [...filaSilabas];
+        let distratores = todasSilabas.filter(s => s !== silabaCerta);
+        distratores.sort(() => 0.5 - Math.random());
+        opcoes.push(...distratores.slice(0, criaturasNaTela - 1));
+        
+        while(opcoes.length < criaturasNaTela) opcoes.push("CHA");
+        opcoes.sort(() => Math.random() - 0.5);
+        opcoes.forEach(sil => criarCriatura(sil, silabaCerta));
+        
+        setTimeout(() => {
+            if (jogoAtivo && !aguardandoProxima) falarSilaba(silabaCerta);
+        }, 500);
+    }
+    
+    function criarCriatura(silaba, silabaAlvo) {
+        const creature = document.createElement("div");
+        creature.className = "creature";
+        
+        const posTop = Math.random() * 70 + 10;
+        creature.style.top = posTop + "%";
+        
+        const direita = Math.random() > 0.5;
+        const duracao = (Math.random() * 5) + 4.5;
+        creature.style.animation = direita ? `nadar-direita ${duracao}s linear infinite` : `nadar-esquerda ${duracao}s linear infinite`;
+        
+        const emoji = criaturas[Math.floor(Math.random() * criaturas.length)];
+        const flip = direita ? 'transform: scaleX(-1);' : '';
+        const fontSize = silaba.length > 3 ? "15px" : "18px";
+        
+        creature.innerHTML = `<span class="creature-icon" style="${flip}">${emoji}</span>
+                              <span class="silaba-creature" style="font-size: ${fontSize};">${silaba}</span>`;
+        
+        const handleClick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!jogoAtivo || aguardandoProxima) return;
+            
+            const rect = creature.getBoundingClientRect();
+            if (silaba === silabaAlvo) {
+                acertou(creature, silaba, rect.left + 30, rect.top + 30);
+            } else {
+                errou(creature, silaba);
+            }
+        };
+        
+        creature.addEventListener('click', handleClick);
+        creature.addEventListener('touchstart', handleClick, { passive: false });
+        
+        aquario.appendChild(creature);
+    }
+    
+    function acertou(creatureElem, silabaClicada, x, y) {
+        if (!jogoAtivo) return;
+        jogoAtivo = false;
+        
+        if (audioEnabled) { 
+            sfxPescado.currentTime = 0; 
+            sfxPescado.play().catch(e=>{}); 
+        }
+        
+        const rect = creatureElem.getBoundingClientRect();
+        creatureElem.style.animation = "none";
+        creatureElem.style.left = rect.left + "px";
+        creatureElem.style.top = rect.top + "px";
+        creatureElem.classList.add("pescado");
+        
+        pontuacaoTotal += 15;
+        acertosNaEtapa++;
+        atualizarUI();
+        
+        mostrarFeedback(silabaClicada, true, x || rect.left + 30, y || rect.top + 30);
+        
+        falar(`Muito bem! ${pronunciaComplexa[silabaClicada.toUpperCase()] || silabaClicada.toLowerCase()}`, () => {
+            indiceSilabaAtual++;
+            if (indiceSilabaAtual < filaSilabas.length) {
+                jogoAtivo = true;
+                carregarProximaSilaba();
+            } else { 
+                concluirEtapa(); 
+            }
+        });
+    }
+    
+    function errou(creatureElem, silabaErrada) {
+        if (!jogoAtivo) return;
+        if (audioEnabled && sfxErro) { 
+            sfxErro.currentTime = 0; 
+            sfxErro.play().catch(e=>{}); 
+        }
+        mostrarFeedback(silabaErrada, false);
+        creatureElem.classList.add("erro-anim");
+        setTimeout(() => creatureElem.classList.remove("erro-anim"), 400);
+        falarSilaba(silabaErrada);
+    }
+    
+    function iniciarEtapa() {
+        if (faseAtual > categorias.length) { finalizarJogoCompleto(); return; }
+        categoriaCorrente = categorias[faseAtual - 1];
+        filaSilabas = [...categoriaCorrente.silabas];
+        if (filaSilabas.length === 0) { concluirEtapa(); return; }
+        indiceSilabaAtual = 0;
+        acertosNaEtapa = 0;
+        atualizarUI();
+        jogoAtivo = true;
+        aguardandoProxima = false;
+        iniciarCronometro();
+        carregarProximaSilaba();
+    }
+    
+    function concluirEtapa() {
+        if (aguardandoProxima) return;
+        const tempoEtapa = pararCronometro();
+        temposEtapas[faseAtual - 1] = tempoEtapa;
+        
+        aguardandoProxima = true;
+        jogoAtivo = false;
+        aquario.innerHTML = "";
+        criarEfeitoBolhas(50);
+        
+        document.getElementById("vitoria-msg-topo").innerHTML = `✨ ${categoriaCorrente.nome} ✨`;
+        document.getElementById("scoreFinalModal").innerHTML = `✅ Acertos: ${acertosNaEtapa}/${filaSilabas.length} | Pontos: ${pontuacaoTotal}`;
+        document.getElementById("tempoEtapa").innerHTML = `⏱️ Tempo: ${formatarTempo(tempoEtapa)}`;
+        
+        let msg = faseAtual < categorias.length ? "🐢 Nova categoria de sílabas chegou!" : "🏆 VOCÊ DOMINOU AS SÍLABAS COMPLEXAS! 🏆";
+        document.getElementById("vitoria-msg-sub").innerHTML = msg;
+        modalVitoria.style.display = "flex";
+        
+        falarMensagem(msg, () => {
+            setTimeout(() => {
+                modalVitoria.style.display = "none";
+                if (faseAtual < categorias.length) { 
+                    faseAtual++; 
+                    iniciarEtapa();
+                } else { 
+                    finalizarJogoCompleto(); 
+                }
+            }, 2000);
+        });
+    }
+    
+    function finalizarJogoCompleto() {
+        jogoAtivo = false;
+        aquario.innerHTML = "";
+        criarEfeitoBolhas(70);
+        
+        let tempoTotal = temposEtapas.reduce((a,b) => a + b, 0);
+        document.getElementById("vitoria-msg-topo").innerHTML = "🏆 MESTRE DAS SÍLABAS COMPLEXAS 🏆";
+        document.getElementById("vitoria-msg-sub").innerHTML = "🐢 Todas as categorias concluídas! 🐠";
+        document.getElementById("scoreFinalModal").innerHTML = `🌟 Pontuação final: ${pontuacaoTotal} 🌟`;
+        document.getElementById("tempoEtapa").innerHTML = `⏱️ Tempo total: ${formatarTempo(tempoTotal)}`;
+        modalVitoria.style.display = "flex";
+        falarMensagem("Parabéns! Você dominou todas as sílabas complexas do mar profundo!");
+        setTimeout(() => modalVitoria.style.display = "none", 6000);
+    }
+    
+    // ========== NAVEGAÇÃO ==========
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
+    }
+    
+    function toggleAudio() {
+        audioEnabled = !audioEnabled;
+        btnAudio.innerText = audioEnabled ? "🔊" : "🔇";
+        if (audioEnabled) bgAudio.play().catch(e=>{});
+        else bgAudio.pause();
+    }
+    
+    function voltarMenu() {
+        if (aguardandoProxima) return;
+        modalNavegacao.style.display = "flex";
+        falarMensagem("Voltar ao menu principal?");
+    }
+    
+    document.getElementById("btnVoltar").addEventListener("click", voltarMenu);
+    document.getElementById("btnCancelarVolta").addEventListener("click", () => modalNavegacao.style.display = "none");
+    document.getElementById("btnConfirmarVolta").addEventListener("click", () => {
+        modalNavegacao.style.display = "none";
+        falarMensagem("Voltando ao menu!");
+        setTimeout(() => window.location.href = "index.html", 500);
+    });
+    
+    document.getElementById("btnRepetirSilaba").addEventListener("click", (e) => {
+        if (e.target.id !== "silabaAlvo") repetirSilabaAlvo();
+    });
+    document.getElementById("silabaAlvo").addEventListener("click", (e) => {
+        e.stopPropagation();
+        repetirSilabaAlvo();
+    });
+    document.getElementById("silabaAlvo").addEventListener("touchstart", (e) => {
+        e.stopPropagation();
+        repetirSilabaAlvo();
+    }, { passive: true });
+    
+    // Inicialização
+    let vozDesbloqueada = false;
+    const desbloquearVoz = () => {
+        if (!vozDesbloqueada && window.speechSynthesis) {
+            window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
+            vozDesbloqueada = true;
+        }
+    };
+    document.addEventListener('touchstart', desbloquearVoz, { once: true });
+    document.addEventListener('click', desbloquearVoz, { once: true });
+    
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        const cursor = document.createElement('div');
+        cursor.className = 'custom-cursor';
+        document.body.appendChild(cursor);
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+        document.addEventListener('mouseleave', () => { cursor.style.display = 'none'; });
+        document.addEventListener('mouseenter', () => { cursor.style.display = 'block'; });
+    }
+    
+    window.addEventListener('resize', () => {
+        criaturasNaTela = window.innerWidth < 768 ? 3 : (window.innerWidth < 1024 ? 4 : 5);
+    });
+    
+    setInterval(() => {
+        if (jogoAtivo && !aguardandoProxima && Math.random() > 0.85) {
+            const bolha = document.createElement("div");
+            bolha.className = "bolha";
+            const tam = Math.random() * 20 + 8 + "px";
+            bolha.style.width = tam; bolha.style.height = tam;
+            bolha.style.left = Math.random() * 100 + "vw";
+            bolha.style.animationDuration = Math.random() * 3 + 2 + "s";
+            document.body.appendChild(bolha);
+            setTimeout(() => bolha.remove(), 5000);
+        }
+    }, 1000);
+    
+    window.onload = () => {
+        criarParticulasLuz();
+        iniciarEtapa();
+    };
+</script>
+</body>
+</html>
